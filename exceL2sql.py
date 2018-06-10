@@ -7,11 +7,6 @@ import sql_insert_template
 import configutil
 
 
-def getSqlTemplate(sql_template_name):
-    return ""
-    pass
-
-
 def loadExcel():
     '''
     读取配置文件中待解析excel文件\文件列表,以及输出sql文件路径.
@@ -21,7 +16,7 @@ def loadExcel():
     filepaths, outputpath_base, thesqltemplate = config.getConfigString(
         'EXCELINPUTPATH'), config.getConfigString('SQLOUTPUTPATH'), config.getConfigString('SQLTEMPLATE')
     print('解析EXCEL文件源: %s' % (filepaths))
-    sqltemplate = getSqlTemplate(thesqltemplate)
+    sqltemplate = getSqlTemplateByName(thesqltemplate)
     if type(filepaths) is list:
         for filepath in filepaths:
             (filename, ext) = os.path.splitext(os.path.basename(filepath))
@@ -41,6 +36,11 @@ def loadExcel():
         e2s.parseWorkBook()
         pass
     print('解析完毕', end='\n\n')
+
+
+def getSqlTemplateByName(sql_template_name):
+    template_obj = getattr(sql_insert_template, sql_template_name)()
+    return template_obj
 
 
 class Excel2sql(object):
@@ -111,5 +111,9 @@ class Excel2sql(object):
 
 
 if __name__ == "__main__":
-    loadExcel(sql_insert_template.SQL_insert_TESC())
+    # loadExcel()
+    templatetest = getSqlTemplateByName("SQL_insert_test")
+    column, value = templatetest.getSQL()
+    print("template column is %s" % column)
+    print("template value is %s" % value)
     pass

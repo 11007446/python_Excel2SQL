@@ -13,6 +13,25 @@ class SQL_insert_template(object):
     pass
 
 
+class SQL_insert_test(SQL_insert_template):
+    '''
+    科技统计外部数据导入脚本模版
+    导入表 tesc
+    '''
+
+    def __init__(self):
+        self.BASE_SQL = {
+            'Sheet1':
+            'test1'
+        }
+        self.VALUE_SQL = {
+            'Sheet1':
+            'test2'
+        }
+
+    pass
+
+
 class SQL_insert_TESC(SQL_insert_template):
     '''
     科技统计外部数据导入脚本模版
