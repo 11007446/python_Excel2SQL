@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-#Filename:SQL_insert_template.py
+# Filename:SQL_insert_template.py
 
 
 class SQL_insert_template(object):

@@ -4,19 +4,24 @@ import openpyxl
 import os
 import shutil
 import sql_insert_template
-from configutil import ConfigUtil
+import configutil
 
 
-def loadExcel(sqltemplate):
+def getSqlTemplate(sql_template_name):
+    return ""
+    pass
+
+
+def loadExcel():
     '''
     读取配置文件中待解析excel文件\文件列表,以及输出sql文件路径.
     解析Excel内容,生成Sql Insert语句执行,并保存到sql文件留档
     '''
-    config = ConfigUtil()
-    filepaths, outputpath_base = config.getConfigString(
-        'EXCELINPUTPATH'), config.getConfigString('SQLOUTPUTPATH')
+    config = configutil.ConfigUtil()
+    filepaths, outputpath_base, thesqltemplate = config.getConfigString(
+        'EXCELINPUTPATH'), config.getConfigString('SQLOUTPUTPATH'), config.getConfigString('SQLTEMPLATE')
     print('解析EXCEL文件源: %s' % (filepaths))
-
+    sqltemplate = getSqlTemplate(thesqltemplate)
     if type(filepaths) is list:
         for filepath in filepaths:
             (filename, ext) = os.path.splitext(os.path.basename(filepath))
@@ -72,11 +77,12 @@ class Excel2sql(object):
 
         output_filename = sheet_title + '_' + str(
             datetime.datetime.now().strftime('%Y%m%d%H%M'))
-        #with open(output_path + output_filename, 'w', encoding='utf-8') as fw:
-        loopindex = 0
-        fw = open(output_path + output_filename + '.sql', 'w', encoding='utf-8')
-        for row in sheet.iter_rows(
-                row_offset=startRow, max_row=maxRow - startRow):
+        # with open(output_path + output_filename, 'w', encoding='utf-8') as fw:
+
+        fw = open(output_path + output_filename +
+                  '.sql', 'w', encoding='utf-8')
+        for loopindex, row in enumerate(sheet.iter_rows(
+                row_offset=startRow, max_row=maxRow - startRow)):
             rowlist = []
             for cell in row:
                 cellvalue = cell.value
@@ -91,14 +97,15 @@ class Excel2sql(object):
             if (loopindex > 0 and loopindex % pagemaxrow == 0):
                 fw.close()
                 fw = open(
-                    output_path + output_filename + '_' + str(loopindex) + '.sql',
+                    output_path + output_filename +
+                    '_' + str(loopindex) + '.sql',
                     'w',
                     encoding='utf-8')
-            loopindex = loopindex + 1
+
             fw.write(mainsql + '\n')
         fw.write('--%s数据共计%d条\n\n' % (sheet_title, loopindex))
         fw.close()
-        #pass
+        # pass
 
     pass
 
