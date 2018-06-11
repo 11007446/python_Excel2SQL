@@ -13,8 +13,11 @@ def loadExcel():
     解析Excel内容,生成Sql Insert语句执行,并保存到sql文件留档
     '''
     config = configutil.ConfigUtil()
-    filepaths, outputpath_base, thesqltemplate = config.getConfigString(
-        'EXCELINPUTPATH'), config.getConfigString('SQLOUTPUTPATH'), config.getConfigString('SQLTEMPLATE')
+    filepaths, outputpath_base, thesqltemplate, startrow, sheetsize = config.getConfigString(
+        'EXCELINPUTPATH'), config.getConfigString(
+            'SQLOUTPUTPATH'), config.getConfigString(
+                'SQLTEMPLATE'), config.getConfigString(
+                    'PARSESTARTROW'), config.getConfigString('SHEETSIZE')
     print('解析EXCEL文件源: %s' % (filepaths))
     sqltemplate = getSqlTemplateByName(thesqltemplate)
     if type(filepaths) is list:
@@ -23,7 +26,8 @@ def loadExcel():
             outputpath_folder = '%s_%s' % (
                 filename, str(datetime.datetime.now().strftime('%Y%m%d')))
             outputpath = outputpath_base + outputpath_folder + '/'
-            e2s = Excel2sql(sqltemplate, [filepath, outputpath])
+            e2s = Excel2sql(sqltemplate,
+                            [filepaths, outputpath, startrow, sheetsize])
             e2s.parseWorkBook()
             pass
         pass
@@ -32,7 +36,8 @@ def loadExcel():
         outputpath_folder = '%s_%s生成' % (
             filename, str(datetime.datetime.now().strftime('%Y%m%d')))
         outputpath = outputpath_base + outputpath_folder + '/'
-        e2s = Excel2sql(sqltemplate, [filepaths, outputpath])
+        e2s = Excel2sql(sqltemplate,
+                        [filepaths, outputpath, startrow, sheetsize])
         e2s.parseWorkBook()
         pass
     print('解析完毕', end='\n\n')
@@ -50,7 +55,7 @@ class Excel2sql(object):
         pass
 
     def parseWorkBook(self):
-        filepath, outputpath = self.config
+        filepath, outputpath, startrow, sheetsize = self.config
 
         print('     解析EXCEL文件: %s' % (filepath))
         if os.path.exists(outputpath):
@@ -61,16 +66,20 @@ class Excel2sql(object):
 
         for sheet in wb.sheetnames:
             print('         解析表%s开始' % (sheet))
-            self.parseSheetData2SQL(wb[sheet], outputpath, 2)
+            self.parseSheetData2SQL(wb[sheet], outputpath, startrow, sheetsize)
             print('         解析表%s完成' % (sheet), end='\n\n')
             pass
         print('     解析完毕', end='\n\n')
 
-    def parseSheetData2SQL(self, sheet, output_path, startRow=1, pagemaxrow=5000):
+    def parseSheetData2SQL(self,
+                           sheet,
+                           output_path,
+                           startRow=1,
+                           sheetsize=5000):
 
         sheet_title = sheet.title
         columnpart, valuepart = self.sqltemplate.getSQL()
-        if(sheet_title not in columnpart.keys()):
+        if (sheet_title not in columnpart.keys()):
             return
 
         maxRow, maxCol = sheet.max_row, sheet.max_column
@@ -79,10 +88,11 @@ class Excel2sql(object):
             datetime.datetime.now().strftime('%Y%m%d%H%M'))
         # with open(output_path + output_filename, 'w', encoding='utf-8') as fw:
 
-        fw = open(output_path + output_filename +
-                  '.sql', 'w', encoding='utf-8')
-        for loopindex, row in enumerate(sheet.iter_rows(
-                row_offset=startRow, max_row=maxRow - startRow)):
+        fw = open(
+            output_path + output_filename + '.sql', 'w', encoding='utf-8')
+        for loopindex, row in enumerate(
+                sheet.iter_rows(
+                    row_offset=startRow, max_row=maxRow - startRow)):
             rowlist = []
             for cell in row:
                 cellvalue = cell.value
@@ -94,11 +104,11 @@ class Excel2sql(object):
             mainsql = columnpart[sheet_title] + valuepart[sheet_title].format(
                 rowlist)
 
-            if (loopindex > 0 and loopindex % pagemaxrow == 0):
+            if (loopindex > 0 and loopindex % sheetsize == 0):
                 fw.close()
                 fw = open(
-                    output_path + output_filename +
-                    '_' + str(loopindex) + '.sql',
+                    output_path + output_filename + '_' + str(loopindex) +
+                    '.sql',
                     'w',
                     encoding='utf-8')
 
@@ -111,9 +121,9 @@ class Excel2sql(object):
 
 
 if __name__ == "__main__":
-    # loadExcel()
-    templatetest = getSqlTemplateByName("SQL_insert_test")
-    column, value = templatetest.getSQL()
-    print("template column is %s" % column)
-    print("template value is %s" % value)
+    loadExcel()
+    # templatetest = getSqlTemplateByName("SQL_insert_test")
+    # column, value = templatetest.getSQL()
+    # print("template column is %s" % column)
+    # print("template value is %s" % value)
     pass

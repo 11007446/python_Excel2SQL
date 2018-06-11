@@ -9,5 +9,5 @@ class ConfigUtil:
             'e2s_config.ini', encoding='UTF8')
         pass
 
-    def getConfigString(self, key, section='PATH'):
+    def getConfigString(self, key, section='MAIN'):
         return self.__configObj[section][key]
