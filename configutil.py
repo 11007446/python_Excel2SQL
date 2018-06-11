@@ -6,8 +6,9 @@ class ConfigUtil:
     def __init__(self):
         conf_ini = "./test.ini"
         self.__configObj = configobj.ConfigObj(
-            'e2s_config.ini', encoding='UTF8')
+            './e2s_config.ini', encoding='UTF8')
         pass
 
-    def getConfigString(self, key, section='MAIN'):
-        return self.__configObj[section][key]
+    def getConfigString(self, key):
+        #return self.__configObj['MAIN'][key]dsad
+        return self.__configObj[key]
