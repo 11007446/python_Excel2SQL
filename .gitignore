@@ -1,2 +1,4 @@
-__pycache__/sql_insert_template.cpython-36.pyc
-__pycache__/configutil.cpython-36.pyc
+/__pycache__/
+!.gitignore
+!*.py
+!*.bat
