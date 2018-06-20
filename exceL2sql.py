@@ -106,7 +106,7 @@ class Excel2sql(object):
             rowlist = []
             for cell in row:
                 cellvalue = cell.value
-                if cellvalue is None: 
+                if cellvalue is None:
                     # 若单元格为空,则添加空字符串
                     rowlist.append('')
                 else:
