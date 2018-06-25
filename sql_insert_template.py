@@ -3,7 +3,7 @@
 
 
 class SQL_base_template(object):
-    def __init__(self)                     :
+    def __init__(self):
         self.BASE_SQL = None
         self.VALUE_SQL = None
 
